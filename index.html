@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SabziGo - Fresh Vegetables</title>
 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f8f4;
+      color: #222;
+    }
+
+    header {
+      background: #16803c;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .search {
+      padding: 15px;
+      text-align: center;
+      background: white;
+    }
+
+    .search input {
+      width: 95%;
+      max-width: 600px;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .product {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px #ddd;
+    }
+
+    .emoji {
+      font-size: 55px;
+    }
+
+    .product h3 {
+      margin: 10px 0 5px;
+    }
+
+    .price {
+      color: #16803c;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    button {
+      background: #16803c;
+      color: white;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+
+    .cart {
+      margin-top: 25px;
+      background: #16803c;
+      color: white;
+      padding: 18px;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 500px) {
+      .products {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🥬 SabziGo</h1>
+    <p>Fresh Sabzi • Best Price • Easy Order</p>
+  </header>
+
+  <div class="search">
+    <input
+      type="text"
+      id="search"
+      placeholder="🔍 सब्ज़ी खोजें..."
+      oninput="searchProducts()"
+    >
+  </div>
+
+  <div class="container">
+
+    <h2>🥦 Fresh Vegetables</h2>
+
+    <div class="products" id="products">
+
+      <div class="product">
+        <div class="emoji">🥔</div>
+        <h3>आलू</h3>
+        <p class="price">₹30 / kg</p>
+        <button onclick="addCart('आलू')">🛒 Add</button>
+      </div>
+
+      <div class="product">
+        <div class="emoji">🍅</div>
+        <h3>टमाटर</h3>
+        <p class="price">₹40 / kg</p>
+        <button onclick="addCart('टमाटर')">🛒 Add</button>
+      </div>
+
+      <div class="product">
+        <div class="emoji">🥕</div>
+        <h3>गाजर</h3>
+        <p class="price">₹50 / kg</p>
+        <button onclick="addCart('गाजर')">🛒 Add</button>
+      </div>
+
+      <div class="product">
+        <div class="emoji">🥦</div>
+        <h3>फूलगोभी</h3>
+        <p class="price">₹45 / kg</p>
+        <button onclick="addCart('फूलगोभी')">🛒 Add</button>
+      </div>
+
+    </div>
+
+    <div class="cart">
+      🛒 Cart: <span id="cartCount">0</span>
+    </div>
+
+  </div>
+
+  <script>
+    let cartCount = 0;
+
+    function addCart(name) {
+      cartCount++;
+      document.getElementById("cartCount").innerText = cartCount;
+      alert(name + " cart में add हो गई!");
+    }
+
+    function searchProducts() {
+      let search =
+        document.getElementById("search").value.toLowerCase();
+
+      let products =
+        document.querySelectorAll(".product");
+
+      products.forEach(function(product) {
+        let name =
+          product.querySelector("h3").innerText.toLowerCase();
+
+        product.style.display =
+          name.includes(search) ? "block" : "none";
+      });
+    }
+  </script>
+
+</body>
+</html>
