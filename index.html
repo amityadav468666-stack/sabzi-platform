@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SabziGo - Fresh Vegetables</title>
+  <title>SabziGo - Online Sabzi</title>
 
   <style>
     * {
@@ -29,6 +29,37 @@
       font-size: 30px;
     }
 
+    nav {
+      background: white;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 2px 6px #ddd;
+    }
+
+    nav button {
+      margin: 5px;
+    }
+
+    button {
+      background: #16803c;
+      color: white;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 9px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0d642d;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
     .search {
       padding: 15px;
       text-align: center;
@@ -42,12 +73,6 @@
       border: 1px solid #ddd;
       border-radius: 12px;
       font-size: 16px;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
     }
 
     .products {
@@ -65,11 +90,7 @@
     }
 
     .emoji {
-      font-size: 55px;
-    }
-
-    .product h3 {
-      margin: 10px 0 5px;
+      font-size: 50px;
     }
 
     .price {
@@ -78,13 +99,8 @@
       font-size: 18px;
     }
 
-    button {
-      background: #16803c;
-      color: white;
-      border: none;
-      padding: 11px 18px;
-      border-radius: 9px;
-      font-size: 15px;
+    .stock {
+      color: #666;
     }
 
     .cart {
@@ -97,9 +113,54 @@
       font-size: 18px;
     }
 
+    .panel {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px #ddd;
+      margin-top: 20px;
+    }
+
+    .panel input,
+    .panel select {
+      width: 100%;
+      padding: 13px;
+      margin: 7px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .shop-product {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-top: 10px;
+      background: #f4f8f4;
+      border-radius: 10px;
+    }
+
+    .delete {
+      background: #d93025;
+    }
+
+    .delete:hover {
+      background: #b82018;
+    }
+
     @media (max-width: 500px) {
       .products {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .shop-product {
+        display: block;
+      }
+
+      .shop-product button {
+        margin-top: 8px;
       }
     }
   </style>
@@ -107,10 +168,18 @@
 
 <body>
 
-  <header>
-    <h1>🥬 SabziGo</h1>
-    <p>Fresh Sabzi • Best Price • Easy Order</p>
-  </header>
+<header>
+  <h1>🥬 SabziGo</h1>
+  <p>Fresh Sabzi • Best Price • Easy Order</p>
+</header>
+
+<nav>
+  <button onclick="showCustomer()">👤 Customer</button>
+  <button onclick="showShopkeeper()">🏪 Shopkeeper</button>
+</nav>
+
+<!-- CUSTOMER -->
+<div id="customerPage">
 
   <div class="search">
     <input
@@ -122,72 +191,282 @@
   </div>
 
   <div class="container">
-
     <h2>🥦 Fresh Vegetables</h2>
 
-    <div class="products" id="products">
-
-      <div class="product">
-        <div class="emoji">🥔</div>
-        <h3>आलू</h3>
-        <p class="price">₹30 / kg</p>
-        <button onclick="addCart('आलू')">🛒 Add</button>
-      </div>
-
-      <div class="product">
-        <div class="emoji">🍅</div>
-        <h3>टमाटर</h3>
-        <p class="price">₹40 / kg</p>
-        <button onclick="addCart('टमाटर')">🛒 Add</button>
-      </div>
-
-      <div class="product">
-        <div class="emoji">🥕</div>
-        <h3>गाजर</h3>
-        <p class="price">₹50 / kg</p>
-        <button onclick="addCart('गाजर')">🛒 Add</button>
-      </div>
-
-      <div class="product">
-        <div class="emoji">🥦</div>
-        <h3>फूलगोभी</h3>
-        <p class="price">₹45 / kg</p>
-        <button onclick="addCart('फूलगोभी')">🛒 Add</button>
-      </div>
-
-    </div>
+    <div class="products" id="products"></div>
 
     <div class="cart">
       🛒 Cart: <span id="cartCount">0</span>
     </div>
+  </div>
+
+</div>
+
+<!-- SHOPKEEPER -->
+<div class="container">
+
+  <div id="shopkeeperPage" class="panel">
+
+    <h2>🏪 Shopkeeper Panel</h2>
+
+    <p>नई सब्ज़ी जोड़ें:</p>
+
+    <input
+      type="text"
+      id="vegName"
+      placeholder="सब्ज़ी का नाम"
+    >
+
+    <input
+      type="text"
+      id="vegEmoji"
+      placeholder="Emoji जैसे 🥔"
+    >
+
+    <input
+      type="number"
+      id="vegPrice"
+      placeholder="Price ₹ / kg"
+    >
+
+    <input
+      type="number"
+      id="vegStock"
+      placeholder="Stock kg"
+    >
+
+    <button onclick="addVegetable()">
+      ➕ सब्ज़ी Add करें
+    </button>
+
+    <hr>
+
+    <h3>📦 आपकी सब्ज़ियाँ</h3>
+
+    <div id="shopProducts"></div>
 
   </div>
 
-  <script>
-    let cartCount = 0;
+</div>
 
-    function addCart(name) {
-      cartCount++;
-      document.getElementById("cartCount").innerText = cartCount;
-      alert(name + " cart में add हो गई!");
+<script>
+
+  let vegetables = [
+    {
+      name: "आलू",
+      emoji: "🥔",
+      price: 30,
+      stock: 50
+    },
+    {
+      name: "टमाटर",
+      emoji: "🍅",
+      price: 40,
+      stock: 30
+    },
+    {
+      name: "गाजर",
+      emoji: "🥕",
+      price: 50,
+      stock: 25
+    },
+    {
+      name: "फूलगोभी",
+      emoji: "🥦",
+      price: 45,
+      stock: 20
+    }
+  ];
+
+  let cartCount = 0;
+
+  function showCustomer() {
+
+    document.getElementById("customerPage").style.display = "block";
+    document.getElementById("shopkeeperPage").style.display = "none";
+
+    displayVegetables();
+  }
+
+  function showShopkeeper() {
+
+    document.getElementById("customerPage").style.display = "none";
+    document.getElementById("shopkeeperPage").style.display = "block";
+
+    displayShopProducts();
+  }
+
+  function displayVegetables() {
+
+    let box = document.getElementById("products");
+
+    box.innerHTML = "";
+
+    vegetables.forEach(function(veg, index) {
+
+      box.innerHTML += `
+        <div class="product">
+
+          <div class="emoji">${veg.emoji}</div>
+
+          <h3>${veg.name}</h3>
+
+          <p class="price">
+            ₹${veg.price} / kg
+          </p>
+
+          <p class="stock">
+            Stock: ${veg.stock} kg
+          </p>
+
+          <button onclick="addCart('${veg.name}')">
+            🛒 Add
+          </button>
+
+        </div>
+      `;
+
+    });
+  }
+
+  function displayShopProducts() {
+
+    let box = document.getElementById("shopProducts");
+
+    box.innerHTML = "";
+
+    vegetables.forEach(function(veg, index) {
+
+      box.innerHTML += `
+        <div class="shop-product">
+
+          <div>
+            <strong>
+              ${veg.emoji} ${veg.name}
+            </strong>
+
+            <br>
+
+            ₹${veg.price} / kg
+
+            <br>
+
+            Stock: ${veg.stock} kg
+          </div>
+
+          <button
+            class="delete"
+            onclick="deleteVegetable(${index})"
+          >
+            🗑️ Delete
+          </button>
+
+        </div>
+      `;
+
+    });
+  }
+
+  function addVegetable() {
+
+    let name =
+      document.getElementById("vegName").value;
+
+    let emoji =
+      document.getElementById("vegEmoji").value || "🥬";
+
+    let price =
+      document.getElementById("vegPrice").value;
+
+    let stock =
+      document.getElementById("vegStock").value;
+
+    if (
+      name === "" ||
+      price === "" ||
+      stock === ""
+    ) {
+
+      alert("कृपया सभी जानकारी भरें।");
+      return;
+
     }
 
-    function searchProducts() {
-      let search =
-        document.getElementById("search").value.toLowerCase();
+    vegetables.push({
 
-      let products =
-        document.querySelectorAll(".product");
+      name: name,
+      emoji: emoji,
+      price: Number(price),
+      stock: Number(stock)
 
-      products.forEach(function(product) {
-        let name =
-          product.querySelector("h3").innerText.toLowerCase();
+    });
 
-        product.style.display =
-          name.includes(search) ? "block" : "none";
-      });
+    document.getElementById("vegName").value = "";
+    document.getElementById("vegEmoji").value = "";
+    document.getElementById("vegPrice").value = "";
+    document.getElementById("vegStock").value = "";
+
+    displayShopProducts();
+
+    alert("✅ सब्ज़ी successfully add हो गई!");
+
+  }
+
+  function deleteVegetable(index) {
+
+    if (
+      confirm("क्या आप यह सब्ज़ी हटाना चाहते हैं?")
+    ) {
+
+      vegetables.splice(index, 1);
+
+      displayShopProducts();
+      displayVegetables();
+
     }
-  </script>
+
+  }
+
+  function addCart(name) {
+
+    cartCount++;
+
+    document.getElementById("cartCount").innerText =
+      cartCount;
+
+    alert(name + " cart में add हो गई!");
+
+  }
+
+  function searchProducts() {
+
+    let search =
+      document.getElementById("search")
+      .value
+      .toLowerCase();
+
+    let products =
+      document.querySelectorAll(".product");
+
+    products.forEach(function(product) {
+
+      let name =
+        product.querySelector("h3")
+        .innerText
+        .toLowerCase();
+
+      product.style.display =
+        name.includes(search)
+          ? "block"
+          : "none";
+
+    });
+
+  }
+
+  displayVegetables();
+
+</script>
 
 </body>
 </html>
