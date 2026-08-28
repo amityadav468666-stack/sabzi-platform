@@ -103,10 +103,30 @@ footer{text-align:center;background:#16803c;color:#fff;padding:20px;margin-top:3
 
 <div id="cartModal" class="modal hidden">
 <div class="modalbox">
+  <div id="checkoutForm" class="hidden">
+  <h2>📦 Checkout</h2>
+
+  <input id="customerName" type="text"
+         placeholder="अपना नाम">
+
+  <input id="customerPhone" type="tel"
+         placeholder="Mobile Number">
+
+  <textarea id="customerAddress"
+            placeholder="पूरा Delivery Address"
+            style="width:100%;padding:11px;margin:6px 0 12px;border:1px solid #ccc;border-radius:8px;min-height:90px"></textarea>
+
+  <textarea id="orderNote"
+            placeholder="Order Note (optional)"
+            style="width:100%;padding:11px;margin:6px 0 12px;border:1px solid #ccc;border-radius:8px;min-height:70px"></textarea>
+
+  <button id="confirmOrder">✅ Confirm Order</button>
+  <button class="secondary" id="backToCart">← Back to Cart</button>
+  </div>
 <h2>🛒 आपका Cart</h2>
 <div id="cartItems"></div>
 <h3>Total: <span id="cartTotal">₹0</span></h3>
-<button id="placeOrder">Order Place करें</button>
+<button id="placeOrder">Checkout करें</button>
 <button class="secondary" id="closeCart">Close</button>
 </div>
 </div>
@@ -730,5 +750,101 @@ notice("Website data load नहीं हुआ: "+error.message);
 
 renderCart();
 </script>
+ $("placeOrder").onclick=()=>{
+  if(!currentUser){
+    $("cartModal").classList.add("hidden");
+    $("authModal").classList.remove("hidden");
+    notice("Order के लिए Login करें।");
+    return;
+  }
+
+  if(!cart.length){
+    notice("Cart खाली है।");
+    return;
+  }
+
+  $("cartItems").classList.add("hidden");
+  $("checkoutForm").classList.remove("hidden");
+};
+
+$("backToCart").onclick=()=>{
+  $("checkoutForm").classList.add("hidden");
+  $("cartItems").classList.remove("hidden");
+};
+
+$("confirmOrder").onclick=async()=>{
+  const name=$("customerName").value.trim();
+  const phone=$("customerPhone").value.trim();
+  const address=$("customerAddress").value.trim();
+  const note=$("orderNote").value.trim();
+
+  if(!name){
+    notice("अपना नाम डालें।");
+    return;
+  }
+
+  if(!phone){
+    notice("Mobile Number डालें।");
+    return;
+  }
+
+  if(!/^[0-9]{10}$/.test(phone)){
+    notice("सही 10 digit Mobile Number डालें।");
+    return;
+  }
+
+  if(!address){
+    notice("Delivery Address डालें।");
+    return;
+  }
+
+  try{
+    const total=cart.reduce(
+      (sum,item)=>sum+Number(item.price)*Number(item.qty),0
+    );
+
+    await addDoc(collection(db,"orders"),{
+      customerId:currentUser.uid,
+      customerEmail:currentUser.email,
+
+      customerName:name,
+      customerPhone:phone,
+      deliveryAddress:address,
+      note:note,
+
+      items:cart.map(item=>({
+        productId:item.id,
+        name:item.name,
+        price:Number(item.price),
+        qty:Number(item.qty),
+        ownerId:item.ownerId,
+        shopId:item.shopId,
+        shopName:item.shopName
+      })),
+
+      total:total,
+      status:"Pending",
+      createdAt:serverTimestamp()
+    });
+
+    cart=[];
+    saveCart();
+
+    $("customerName").value="";
+    $("customerPhone").value="";
+    $("customerAddress").value="";
+    $("orderNote").value="";
+
+    $("checkoutForm").classList.add("hidden");
+    $("cartItems").classList.remove("hidden");
+    $("cartModal").classList.add("hidden");
+
+    notice("✅ Order successfully place हो गया।",true);
+
+  }catch(error){
+    console.error(error);
+    notice("Order save नहीं हुआ: "+error.message);
+  }
+}; 
 </body>
   </html>
