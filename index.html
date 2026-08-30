@@ -756,6 +756,247 @@ notice("Website data load नहीं हुआ: "+error.message);
 });
 
 renderCart();
+  async function loadShopProducts(){
+
+  if(!currentUser || !currentShop)return;
+
+  const box=$("shopProducts");
+  if(!box)return;
+
+  box.innerHTML="<p>Products load हो रहे हैं...</p>";
+
+  try{
+
+    const ref=collection(
+      db,
+      "users",
+      currentUser.uid,
+      "shops",
+      currentShop.id,
+      "products"
+    );
+
+    const snap=await getDocs(ref);
+
+    box.innerHTML="";
+
+    if(snap.empty){
+      box.innerHTML="<p>अभी कोई Product नहीं है।</p>";
+      return;
+    }
+
+    snap.forEach(productDoc=>{
+
+      const p=productDoc.data();
+
+      const card=document.createElement("div");
+      card.className="product";
+
+      card.innerHTML=`
+        <h3>🥬 ${esc(p.name||"Product")}</h3>
+
+        <p>💰 Price: ₹${Number(p.price||0)}</p>
+
+        <p>📦 Stock: ${Number(p.stock||0)}</p>
+
+        <button class="editProduct">✏️ Edit</button>
+        <button class="deleteProduct">🗑️ Delete</button>
+      `;
+
+      card.querySelector(".editProduct").onclick=async()=>{
+
+        const name=prompt("Product का नाम:",p.name||"");
+        if(name===null)return;
+
+        const price=prompt("Price:",p.price||"");
+        if(price===null)return;
+
+        const stock=prompt("Stock:",p.stock||"");
+        if(stock===null)return;
+
+        try{
+
+          await updateDoc(
+            doc(
+              db,
+              "users",
+              currentUser.uid,
+              "shops",
+              currentShop.id,
+              "products",
+              productDoc.id
+            ),
+            {
+              name:name.trim(),
+              price:Number(price),
+              stock:Number(stock),
+              updatedAt:serverTimestamp()
+            }
+          );
+
+          notice("Product update हो गया।",true);
+          await loadShopProducts();
+          await loadCatalog();
+
+        }catch(error){
+
+          notice("Product update नहीं हुआ: "+error.message);
+
+        }
+
+      };
+
+      card.querySelector(".deleteProduct").onclick=async()=>{
+
+        if(!confirm("क्या यह Product delete करना है?"))return;
+
+        try{
+
+          await deleteDoc(
+            doc(
+              db,
+              "users",
+              currentUser.uid,
+              "shops",
+              currentShop.id,
+              "products",
+              productDoc.id
+            )
+          );
+
+          notice("Product delete हो गया।",true);
+          await loadShopProducts();
+          await loadCatalog();
+
+        }catch(error){
+
+          notice("Product delete नहीं हुआ: "+error.message);
+
+        }
+
+      };
+
+      box.appendChild(card);
+
+    });
+
+  }catch(error){
+
+    box.innerHTML=
+      "<p>Products load नहीं हुए: "+
+      esc(error.message)+
+      "</p>";
+
+  }
+}
+
+
+function renderShopProductManager(){
+
+  const shopView=$("shopkeeperView");
+  if(!shopView)return;
+
+  let manager=$("shopProductManager");
+
+  if(manager) {
+    loadShopProducts();
+    return;
+  }
+
+  manager=document.createElement("div");
+  manager.id="shopProductManager";
+  manager.className="product";
+
+  manager.innerHTML=`
+    <h2>🥬 मेरे Products</h2>
+
+    <input id="newProductName"
+      placeholder="Product name">
+
+    <input id="newProductPrice"
+      type="number"
+      placeholder="Price ₹">
+
+    <input id="newProductStock"
+      type="number"
+      placeholder="Stock">
+
+    <button id="addProductButton">
+      ➕ Product Add करें
+    </button>
+
+    <div id="shopProducts"></div>
+  `;
+
+  shopView.appendChild(manager);
+
+  $("addProductButton").onclick=async()=>{
+
+    const name=$("newProductName").value.trim();
+    const price=Number($("newProductPrice").value);
+    const stock=Number($("newProductStock").value);
+
+    if(!name){
+      notice("Product name डालें");
+      return;
+    }
+
+    if(price<0){
+      notice("Price सही डालें");
+      return;
+    }
+
+    if(stock<0){
+      notice("Stock सही डालें");
+      return;
+    }
+
+    if(!currentUser || !currentShop){
+      notice("पहले Shop select करें");
+      return;
+    }
+
+    try{
+
+      await addDoc(
+        collection(
+          db,
+          "users",
+          currentUser.uid,
+          "shops",
+          currentShop.id,
+          "products"
+        ),
+        {
+          name:name,
+          price:price,
+          stock:stock,
+          ownerId:currentUser.uid,
+          shopId:currentShop.id,
+          shopName:currentShop.name||"Shop",
+          createdAt:serverTimestamp()
+        }
+      );
+
+      $("newProductName").value="";
+      $("newProductPrice").value="";
+      $("newProductStock").value="";
+
+      notice("Product successfully add हो गया।",true);
+
+      await loadShopProducts();
+      await loadCatalog();
+
+    }catch(error){
+
+      notice("Product add नहीं हुआ: "+error.message);
+
+    }
+
+  };
+
+  loadShopProducts();
+}
 </script>
  $("placeOrder").onclick=()=>{
   if(!currentUser){
