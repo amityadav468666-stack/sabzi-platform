@@ -1,2 +1,0 @@
-import {auth,db} from './firebase.js'; import {addDoc,collection,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
-document.querySelector('#productForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!auth.currentUser){location.href='login.html';return}try{await addDoc(collection(db,'products'),{name:productName.value,price:Number(price.value),stock:Number(stock.value),shopkeeperId:auth.currentUser.uid,createdAt:serverTimestamp()});alert('Product add हो गया');e.target.reset()}catch(x){alert(x.message)}});
