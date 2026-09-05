@@ -1,16 +1,21 @@
-// Firebase Console से अपनी वास्तविक config यहाँ डालें।
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.firebasestorage.app",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDBnHhIu-BU10YVrqWaitMTE6ZDArp_xhI",
+  authDomain: "sabzigo-2a2dc.firebaseapp.com",
+  projectId: "sabzigo-2a2dc",
+  storageBucket: "sabzigo-2a2dc.firebasestorage.app",
+  messagingSenderId: "395661220461",
+  appId: "1:395661220461:web:cacc5b82055eb35cb43d64",
+  measurementId: "G-PXR1S16SJC"
 };
-const app=initializeApp(firebaseConfig);
-export const auth=getAuth(app);
-export const db=getFirestore(app);
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
